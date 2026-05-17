@@ -1,0 +1,144 @@
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+int debug(int x)
+{
+    cout << "Processing: "
+         << x
+         << endl;
+
+    return x;
+}
+
+class LazyRange
+{
+private:
+    int current;
+    int end;
+
+public:
+    LazyRange(int start, int end)
+    {
+        current = start;
+        this->end = end;
+    }
+
+    bool hasNext()
+    {
+        return current < end;
+    }
+
+    int next()
+    {
+        return current++;
+    }
+};
+
+class LazyFilter
+{
+private:
+    LazyRange& source;
+    function<bool(int)> predicate;
+    int currentValue;
+
+public:
+    LazyFilter(
+        LazyRange& source,
+        function<bool(int)> predicate)
+        : source(source)
+    {
+        this->predicate = predicate;
+    }
+
+    bool hasNext()
+    {
+        while (source.hasNext())
+        {
+            int value = source.next();
+
+            debug(value);
+
+            if (predicate(value))
+            {
+                currentValue = value;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int next()
+    {
+        return currentValue;
+    }
+};
+
+class LazyMap
+{
+private:
+    LazyFilter& source;
+    function<int(int)> func;
+
+public:
+    LazyMap(
+        LazyFilter& source,
+        function<int(int)> func)
+        : source(source)
+    {
+        this->func = func;
+    }
+
+    bool hasNext()
+    {
+        return source.hasNext();
+    }
+
+    int next()
+    {
+        int value = source.next();
+
+        debug(value);
+
+        return func(value);
+    }
+};
+
+int main()
+{
+    LazyRange data(1, 20);
+
+    LazyFilter filtered(
+        data,
+        [](int x)
+        {
+            return x % 2 == 0;
+        });
+
+    LazyMap mapped(
+        filtered,
+        [](int x)
+        {
+            return x * 10;
+        });
+
+    long long sum = 0;
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (mapped.hasNext())
+        {
+            sum += mapped.next();
+        }
+    }
+
+    cout << endl;
+
+    cout << "Sum: "
+         << sum
+         << endl;
+
+    return 0;
+}
