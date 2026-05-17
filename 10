@@ -1,0 +1,68 @@
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+class LazyRange
+{
+private:
+    int current;
+    int end;
+
+public:
+    LazyRange(int start, int end)
+    {
+        current = start;
+        this->end = end;
+    }
+
+    bool hasNext()
+    {
+        return current < end;
+    }
+
+    int next()
+    {
+        return current++;
+    }
+};
+
+class LazyMap
+{
+private:
+    LazyRange& source;
+    function<int(int)> func;
+
+public:
+    LazyMap(
+        LazyRange& source,
+        function<int(int)> func)
+        : source(source)
+    {
+        this->func = func;
+    }
+
+    int next()
+    {
+        return func(source.next());
+    }
+};
+
+int main()
+{
+    LazyRange range(0, 10);
+
+    LazyMap gen(
+        range,
+        [](int x)
+        {
+            return x * x;
+        });
+    cout << gen.next() << endl;
+
+    cout << gen.next() << endl;
+
+    cout << gen.next() << endl;
+
+    return 0;
+}
