@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+
+using namespace std;
+
+class LazyMap
+{
+private:
+    vector<int> data;
+    function<int(int)> func;
+    int index;
+
+public:
+    LazyMap(
+        function<int(int)> func,
+        vector<int> data)
+    {
+        this->func = func;
+        this->data = data;
+        index = 0;
+    }
+
+    bool hasNext()
+    {
+        return index < data.size();
+    }
+
+    int next()
+    {
+        int value = data[index];
+        index++;
+
+        return func(value);
+    }
+};
+
+int main()
+{
+    vector<int> numbers =
+    {
+        1,2,3,4,5
+    };
+
+    LazyMap generator(
+        [](int x)
+        {
+            return x * x;
+        },
+        numbers);
+
+    while (generator.hasNext())
+    {
+        cout << generator.next()
+             << " ";
+    }
+
+    return 0;
+}
