@@ -1,0 +1,41 @@
+#include <iostream>
+
+using namespace std;
+
+class NumberGenerator
+{
+private:
+    int current;
+    int limit;
+
+public:
+    NumberGenerator(int n)
+    {
+        current = 1;
+        limit = n;
+    }
+
+    bool hasNext()
+    {
+        return current <= limit;
+    }
+
+    int next()
+    {
+        return current++;
+    }
+};
+
+int main()
+{
+    NumberGenerator generator(5);
+
+    while (generator.hasNext())
+    {
+        int x = generator.next();
+
+        cout << x << endl;
+    }
+
+    return 0;
+}
