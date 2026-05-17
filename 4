@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+
+using namespace std;
+
+class LazyFilter
+{
+private:
+    vector<int> data;
+    function<bool(int)> predicate;
+    int index;
+
+public:
+    LazyFilter(
+        function<bool(int)> predicate,
+        vector<int> data)
+    {
+        this->predicate = predicate;
+        this->data = data;
+        index = 0;
+    }
+
+    bool hasNext()
+    {
+        while (index < data.size())
+        {
+            if (predicate(data[index]))
+            {
+                return true;
+            }
+
+            index++;
+        }
+
+        return false;
+    }
+
+    int next()
+    {
+        return data[index++];
+    }
+};
+
+int main()
+{
+    vector<int> numbers =
+    {
+        1,2,3,4,5,6
+    };
+
+    LazyFilter generator(
+        [](int x)
+        {
+            return x % 2 == 0;
+        },
+        numbers);
+
+    while (generator.hasNext())
+    {
+        cout << generator.next()
+             << " ";
+    }
+
+    return 0;
+}
