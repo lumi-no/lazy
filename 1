@@ -1,0 +1,69 @@
+у eager-підході значення обчислюються одразу при створенні списку, а у lazy-підході значення обчислюються тільки під час виклику next().  
+Різниця у пам’яті: 
+eager зберігає весь список у пам’яті;  
+lazy зберігає тільки поточний елемент і стан генератора, він використовує менше пам’яті для великих даних.
+
+#include <iostream>
+#include <vector>
+#include <functional>
+
+using namespace std;
+
+class SquareGenerator
+{
+private:
+    vector<int> data;
+    int index;
+
+public:
+    SquareGenerator(vector<int> data)
+    {
+        this->data = data;
+        index = 0;
+    }
+
+    bool hasNext()
+    {
+        return index < data.size();
+    }
+
+    int next()
+    {
+        int value = data[index];
+        index++;
+
+        return value * value;
+    }
+};
+
+int main()
+{
+    vector<int> data = {1, 2, 3, 4, 5};
+
+    vector<int> squares;
+
+    for (int x : data)
+    {
+        squares.push_back(x * x);
+    }
+
+    SquareGenerator generator(data);
+
+    cout << "Eager list:" << endl;
+
+    for (int x : squares)
+    {
+        cout << x << " ";
+    }
+
+    cout << endl << endl;
+
+    cout << "Lazy generator:" << endl;
+
+    while (generator.hasNext())
+    {
+        cout << generator.next() << " ";
+    }
+
+    return 0;
+}
