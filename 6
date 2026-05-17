@@ -1,0 +1,119 @@
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+class LazyRange
+{
+private:
+    int current;
+    int end;
+
+public:
+    LazyRange(int start, int end)
+    {
+        current = start;
+        this->end = end;
+    }
+
+    bool hasNext()
+    {
+        return current < end;
+    }
+
+    int next()
+    {
+        return current++;
+    }
+};
+
+class LazyFilter
+{
+private:
+    LazyRange& source;
+    function<bool(int)> predicate;
+    int currentValue;
+    bool ready;
+
+public:
+    LazyFilter(LazyRange& source, function<bool(int)> predicate)
+        : source(source)
+    {
+        this->predicate = predicate;
+        ready = false;
+    }
+
+    bool hasNext()
+    {
+        while (source.hasNext())
+        {
+            int value = source.next();
+
+            if (predicate(value))
+            {
+                currentValue = value;
+                ready = true;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int next()
+    {
+        ready = false;
+        return currentValue;
+    }
+};
+
+class LazyMap
+{
+private:
+    LazyFilter& source;
+    function<int(int)> func;
+
+public:
+    LazyMap(LazyFilter& source, function<int(int)> func)
+        : source(source)
+    {
+        this->func = func;
+    }
+
+    bool hasNext()
+    {
+        return source.hasNext();
+    }
+
+    int next()
+    {
+        return func(source.next());
+    }
+};
+
+int main()
+{
+    LazyRange data(1, 10);
+
+    LazyFilter evenNumbers(
+        data,
+        [](int x)
+        {
+            return x % 2 == 0;
+        });
+
+    LazyMap squaredNumbers(
+        evenNumbers,
+        [](int x)
+        {
+            return x * x;
+        });
+
+    while (squaredNumbers.hasNext())
+    {
+        cout << squaredNumbers.next()
+             << " ";
+    }
+
+    return 0;
+}
