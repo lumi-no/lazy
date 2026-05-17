@@ -1,0 +1,76 @@
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+int debug(int x)
+{
+    cout << "Processing " << x << endl;
+    return x;
+}
+
+class LazyRange
+{
+private:
+    int current;
+    int end;
+
+public:
+    LazyRange(int start, int end)
+    {
+        current = start;
+        this->end = end;
+    }
+
+    bool hasNext()
+    {
+        return current < end;
+    }
+
+    int next()
+    {
+        return current++;
+    }
+};
+
+class LazyMap
+{
+private:
+    LazyRange& source;
+    function<int(int)> func;
+
+public:
+    LazyMap(LazyRange& source, function<int(int)> func)
+        : source(source)
+    {
+        this->func = func;
+    }
+
+    bool hasNext()
+    {
+        return source.hasNext();
+    }
+
+    int next()
+    {
+        return func(source.next());
+    }
+};
+
+int main()
+{
+    LazyRange data(1, 6);
+
+    LazyMap pipeline(data, debug);
+
+    cout << "Pipeline created" << endl;
+
+    cout << "Start iteration" << endl;
+
+    while (pipeline.hasNext())
+    {
+        cout << pipeline.next() << endl;
+    }
+
+    return 0;
+}
