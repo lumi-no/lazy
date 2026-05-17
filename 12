@@ -1,0 +1,46 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class LineReader
+{
+private:
+    vector<string> lines;
+    int index;
+
+public:
+    LineReader()
+    {
+        lines = {
+            "First line",
+            "Second line",
+            "Third line"
+        };
+
+        index = 0;
+    }
+
+    bool hasNext()
+    {
+        return index < lines.size();
+    }
+
+    string next()
+    {
+        return lines[index++];
+    }
+};
+
+int main()
+{
+    LineReader reader;
+
+    while (reader.hasNext())
+    {
+        cout << reader.next() << endl;
+    }
+
+    return 0;
+}
