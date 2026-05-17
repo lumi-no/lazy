@@ -1,0 +1,35 @@
+#include <iostream>
+
+using namespace std;
+
+class InfiniteNumbers
+{
+private:
+    long long current;
+
+public:
+    InfiniteNumbers()
+    {
+        current = 0;
+    }
+
+    long long next()
+    {
+        return current++;
+    }
+};
+
+int main()
+{
+    InfiniteNumbers generator;
+
+    cout << generator.next() << endl;
+
+    cout << generator.next() << endl;
+
+    cout << generator.next() << endl;
+
+    cout << generator.next() << endl;
+
+    return 0;
+}
