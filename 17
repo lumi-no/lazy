@@ -1,0 +1,77 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+
+using namespace std;
+
+class LazyReduce
+{
+private:
+    vector<int> data;
+    function<int(int, int)> func;
+    int initial;
+    bool calculated;
+    int result;
+
+public:
+    LazyReduce(
+        vector<int> data,
+        function<int(int, int)> func,
+        int initial)
+    {
+        this->data = data;
+        this->func = func;
+        this->initial = initial;
+
+        calculated = false;
+        result = initial;
+    }
+
+    int value()
+    {
+        if (!calculated)
+        {
+            cout << "Calculating..."
+                 << endl;
+
+            result = initial;
+
+            for (int x : data)
+            {
+                result = func(result, x);
+            }
+
+            calculated = true;
+        }
+
+        return result;
+    }
+};
+
+int main()
+{
+    vector<int> numbers =
+    {
+        1,2,3,4,5
+    };
+
+    LazyReduce sum(
+        numbers,
+        [](int acc, int x)
+        {
+            return acc + x;
+        },
+        0);
+
+    cout << "Lazy object created"
+         << endl;
+
+
+    cout << sum.value()
+         << endl;
+
+    cout << sum.value()
+         << endl;
+
+    return 0;
+}
