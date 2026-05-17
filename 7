@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+
+using namespace std;
+
+vector<int> pipeline(
+    vector<int> data,
+    vector<function<vector<int>(vector<int>)>> steps)
+{
+    for (auto step : steps)
+    {
+        data = step(data);
+    }
+
+    return data;
+}
+
+int main()
+{
+    vector<int> numbers =
+    {
+        1,2,3,4,5,6
+    };
+
+    vector<function<vector<int>(vector<int>)>> steps =
+    {
+        
+        [](vector<int> data)
+        {
+            vector<int> result;
+
+            for (int x : data)
+            {
+                if (x % 2 == 0)
+                {
+                    result.push_back(x);
+                }
+            }
+
+            return result;
+        },
+
+        [](vector<int> data)
+        {
+            vector<int> result;
+
+            for (int x : data)
+            {
+                result.push_back(x * x);
+            }
+
+            return result;
+        }
+    };
+
+    vector<int> result =
+        pipeline(numbers, steps);
+
+    for (int x : result)
+    {
+        cout << x << " ";
+    }
+
+    return 0;
+}
