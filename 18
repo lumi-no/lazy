@@ -1,0 +1,122 @@
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+class LazyRange
+{
+private:
+    int current;
+    int end;
+
+public:
+    LazyRange(int start, int end)
+    {
+        current = start;
+        this->end = end;
+    }
+
+    bool hasNext()
+    {
+        return current < end;
+    }
+
+    int next()
+    {
+        return current++;
+    }
+};
+
+class LazyFilter
+{
+private:
+    LazyRange& source;
+    function<bool(int)> predicate;
+    int currentValue;
+
+public:
+    LazyFilter(LazyRange& source, function<bool(int)> predicate)
+        : source(source)
+    {
+        this->predicate = predicate;
+    }
+
+    bool hasNext()
+    {
+        while (source.hasNext())
+        {
+            int value = source.next();
+
+            if (predicate(value))
+            {
+                currentValue = value;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int next()
+    {
+        return currentValue;
+    }
+};
+
+class LazyMap
+{
+private:
+    LazyFilter& source;
+    function<int(int)> func;
+
+public:
+    LazyMap(LazyFilter& source, function<int(int)> func)
+        : source(source)
+    {
+        this->func = func;
+    }
+
+    bool hasNext()
+    {
+        return source.hasNext();
+    }
+
+    int next()
+    {
+        return func(source.next());
+    }
+};
+
+void runPipeline(LazyMap& pipeline, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (pipeline.hasNext())
+        {
+            cout << pipeline.next() << " ";
+        }
+    }
+}
+
+int main()
+{
+    LazyRange data(1, 1000000);
+
+    LazyFilter step1(
+        data,
+        [](int x)
+        {
+            return x % 2 == 0;
+        });
+
+    LazyMap step2(
+        step1,
+        [](int x)
+        {
+            return x * x;
+        });
+
+    runPipeline(step2, 5);
+
+    return 0;
+}
