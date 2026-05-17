@@ -1,0 +1,37 @@
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+function<int(int)> compose(
+    function<int(int)> f,
+    function<int(int)> g)
+{
+    return [f, g](int x)
+    {
+        return f(g(x));
+    };
+}
+
+int main()
+{
+    function<int(int)> square =
+        [](int x)
+        {
+            return x * x;
+        };
+
+    function<int(int)> add10 =
+        [](int x)
+        {
+            return x + 10;
+        };
+
+    auto composed =
+        compose(square, add10);
+
+    cout << composed(5)
+         << endl;
+
+    return 0;
+}
